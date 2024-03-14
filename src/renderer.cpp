@@ -89,63 +89,23 @@ namespace opengles_workspace
 		glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL); // 1 is no of strings used for shader
 		glCompileShader(vertex_shader);
 
-		// int success_vertex_compilation;
-        // glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success_vertex_compilation);
-        // if (!success_vertex_compilation) {
-        //     char errorLog[1024];
-        //     glGetShaderInfoLog(vertex_shader, 1024, NULL, errorLog);
-            // std::cout << "Shader Module compilation error:\n" << errorLog << std::endl;
-        // }
-
 		fragment_shader = glCreateShader(GL_FRAGMENT_SHADER); // create fragment shader
 		glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL); // 1 is no of strings used for shader
 		glCompileShader(fragment_shader);
 
-		// int success_fragment_compilation;
-        // glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success_fragment_compilation);
-        // if (!success_fragment_compilation) {
-        //     char errorLog[1024];
-        //     glGetShaderInfoLog(fragment_shader, 1024, NULL, errorLog);
-            // std::cout << "Shader Module compilation error:\n" << errorLog << std::endl;
-        // }
-
 		fragment_shader2 = glCreateShader(GL_FRAGMENT_SHADER); // create fragment shader
 		glShaderSource(fragment_shader2, 1, &fragment_shader_source2, NULL); // 1 is no of strings used for shader
 		glCompileShader(fragment_shader2);
-
-		// int success_fragment_compilation2;
-        // glGetShaderiv(fragment_shader2, GL_COMPILE_STATUS, &success_fragment_compilation2);
-        // if (!success_fragment_compilation2) {
-        //     char errorLog[1024];
-        //     glGetShaderInfoLog(fragment_shader2, 1024, NULL, errorLog);
-            // std::cout << "Shader Module compilation error:\n" << errorLog << std::endl;
-        // }
 
 		shader_program = glCreateProgram(); // create shader program
 		glAttachShader(shader_program, vertex_shader);
 		glAttachShader(shader_program, fragment_shader);
 		glLinkProgram(shader_program);
 
-		// int success_link;
-        // glGetProgramiv(shader_program, GL_LINK_STATUS, &success_link);
-        // if (!success_link) {
-        //     char errorLog[1024];
-        //     glGetProgramInfoLog(shader_program, 1024, NULL, errorLog);
-            // std::cout << "\nShader linking error:\n" << errorLog << '\n';
-        // }
-
 		shader_program2 = glCreateProgram(); // create shader program
 		glAttachShader(shader_program2, vertex_shader);
 		glAttachShader(shader_program2, fragment_shader2);
 		glLinkProgram(shader_program2);
-
-		// int success_link2;
-        // glGetProgramiv(shader_program2, GL_LINK_STATUS, &success_link2);
-        // if (!success_link2) {
-        //     char errorLog[1024];
-        //     glGetProgramInfoLog(shader_program2, 1024, NULL, errorLog);
-            // std::cout << "\nShader linking error:\n" << errorLog << '\n';
-        // }
 
 		glDeleteShader(vertex_shader); // delete vertex & fragment shaders
 		glDeleteShader(fragment_shader);
@@ -211,105 +171,57 @@ namespace opengles_workspace
 		for (short i = 0; i < double_nr_lines; ++i) {
 			for (short j = 0; j < half_nr_columns; ++j) {
 				if (i < nr_lines) {
-					vertices1[vert_ind++] = x + x_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " "; 
+					vertices1[vert_ind++] = x + x_modifier; 
 					vertices1[vert_ind++] = x + y_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 0;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 0;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = y1 + x_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = x + y_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 1;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 0;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = x + x_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = y2 + y_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 0;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 1;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 
 					vertices1[vert_ind++] = x + x_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = y2 + y_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 0;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 1;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = y1 + x_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = x + y_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 1;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 0;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = y1 + x_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = y2 + y_modifier;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 1;
-					// std::cout << vertices1[vert_ind - 1] << " ";
 					vertices1[vert_ind++] = 1;
-					// std::cout << vertices1[vert_ind - 1] << "\n";
 				} else {
 					vertices2[vert_ind++] = x + x_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = x + y_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 0;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 0;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = y1 + x_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = x + y_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 1;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 0;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = x + x_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = y2 + y_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 0;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 1;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 
 					vertices2[vert_ind++] = x + x_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = y2 + y_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 0;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 1;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = y1 + x_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = x + y_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 1;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 0;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = y1 + x_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = y2 + y_modifier;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 1;
-					// std::cout << vertices2[vert_ind - 1] << " ";
 					vertices2[vert_ind++] = 1;
-					// std::cout << vertices2[vert_ind - 1] << "\n";
 				}
 				x_modifier += (2 * x_step);
 			}
