@@ -12,6 +12,7 @@
 #include <string>
 #define STB_IMAGE_IMPLEMENTATION
 #include "texture.h"
+#include "read_file.hpp"
 #include <unistd.h>
 
 #include <../third_party/glm/glm.hpp>
@@ -51,25 +52,6 @@ namespace opengles_workspace
 	int nr_frames = 0;
 	GLuint VBO, VAO;
 
-	void read_data() 
-	{
-		std::ifstream file_in;
-		file_in.open("../src/data.txt");
-		if (!file_in.is_open()) {
-			return;
-		}
-		std::string line;
-		while (std::getline(file_in, line)) { // search first 2 numbers from file
-			for (auto i : line) {
-				if (isdigit(i)) {
-					nr_frames = nr_frames * 10 + i - '0';
-				}
-			}
-		}
-		file_in.close();
-		speed = (float)1 / nr_frames;
-	}
-
 	void create_shaders() 
 	{
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -108,28 +90,72 @@ namespace opengles_workspace
 	GLFWRenderer::GLFWRenderer(std::shared_ptr<Context> context)
 		: mContext(std::move(context))
 	{
-		read_data();
 		create_shaders();
 		set_buffers();
 	}
 
-	void change_vertices_coordonates() 
+	void change_vertices_coordonates(char ax) 
 	{
-		for (int i = 1; i < sizeof(vertices)/sizeof(float); i += 3) {
+		int vertices_leng = sizeof(vertices)/sizeof(float);
+		int start = (ax == 'x') ? 0 : 1;
+
+		for (int i = start; i < vertices_leng; i += 3) 
+		{
 			vertices[i] += speed;
 		}
-		for (int i = 1; i < sizeof(vertices)/sizeof(float); i += 3) {
-			if (vertices[i] >= 1.0f || vertices[i] <= -1.0f) {
+
+		for (int i = start; i < vertices_leng; i += 3)
+		{ 
+			if (vertices[i] >= 1.0f || vertices[i] <= -1.0f) 
+			{
 				speed *= -1.0f;
-				i = sizeof(vertices)/sizeof(float);
+				i = vertices_leng;
 			}
 		}
+	}
+
+	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		if (key == GLFW_KEY_UP && action == GLFW_REPEAT) 
+		{
+			if (speed < 0) {
+				speed *= -1.0f;
+			}
+			change_vertices_coordonates('y');
+		}
+		else if (key == GLFW_KEY_DOWN && action == GLFW_REPEAT)
+		{
+			if (speed > 0) {
+				speed *= -1.0f;
+			}
+			change_vertices_coordonates('y');
+		} 
+		else if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT)
+		{
+			if (speed > 0) {
+				speed *= -1.0f;
+			}
+			change_vertices_coordonates('x');
+		} 
+		else if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT)
+		{
+			if (speed < 0) {
+				speed *= -1.0f;
+			}
+			change_vertices_coordonates('x');
+		}
+
 	}
 
 	void GLFWRenderer::render() 
 	{
 		// GL code begin
 		glfwInit();
+
+		glfwSetKeyCallback(window(), key_callback);
+		
+		ReadFile reader = ReadFile();
+		int nr_frames = reader.read_file("../src/data.txt");
+		speed = (float)1 / nr_frames;
 
 		while (!glfwWindowShouldClose(window())) {
 			glClear(GL_COLOR_BUFFER_BIT);
@@ -141,7 +167,7 @@ namespace opengles_workspace
 			glfwSwapBuffers(window());
 			glfwPollEvents();
 
-			change_vertices_coordonates();
+			key_callback;
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);

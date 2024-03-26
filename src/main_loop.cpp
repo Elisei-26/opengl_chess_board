@@ -20,6 +20,5 @@ namespace opengles_workspace
 				}
 			}
 		} while (!done);
-		
 	}
 }
