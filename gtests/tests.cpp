@@ -3,7 +3,7 @@
 
 TEST(ReadFrameRateFromFile, read_file_test1) {
     ReadFile readObj;
-    EXPECT_EQ(readObj.read_file("/home/daniel/Desktop/opengles-workspace/src/data.txt"), 60);
+    EXPECT_EQ(readObj.read_file("/home/daniel/Desktop/opengles-workspace/src/data.txt"), 200);
 }
 
 TEST(ReadFrameRateFromFile, read_file_test2) {

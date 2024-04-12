@@ -8,10 +8,11 @@
 #include <glad/gl.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include "../include/Table.hpp"
 
 namespace opengles_workspace
 {
-class GLFWRenderer : public PolledObject
+	class GLFWRenderer : public PolledObject//, public Table
 	{
 	public:
 		GLFWRenderer(std::shared_ptr<Context> context);
@@ -21,8 +22,8 @@ class GLFWRenderer : public PolledObject
 		void render();
 
 		bool poll() override;
+		
 	private:
-
 		std::shared_ptr<Context> mContext;
 		GLFWwindow* window() const { return static_cast<GLFWwindow*>(mContext->window()); }
 	};

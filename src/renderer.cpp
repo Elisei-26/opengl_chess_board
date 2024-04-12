@@ -31,26 +31,17 @@ namespace opengles_workspace
 									)";
 
 	const char* fragmentShaderSource = R"(
-											#version 300 es
-											out highp vec4 FragColor;
+										#version 300 es
+										out highp vec4 FragColor;
 
-											void main() {
-												FragColor = vec4(1.0, 0.5, 0.2, 1.0);
-											}
-										)";
-	float vertices[] = {
-		-0.25f, -1.0f, 0.0f,
-		0.25f, -1.0f, 0.0f,
-		-0.25f,  -0.5f, 0.0f,
-		-0.25f,  -0.5f, 0.0f,
-		0.25f, -1.0f, 0.0f,
-		0.25f, -0.5f, 0.0f
-	};
+										void main() {
+											FragColor = vec4(1.0, 0.5, 0.2, 1.0);
+										}
+									)";
 
-	float speed = 0.0f;
 	GLuint vertexShader, fragmentShader, shaderProgram;
-	int nr_frames = 0;
 	GLuint VBO, VAO;
+	Table tetris_table;
 
 	void create_shaders() 
 	{
@@ -79,7 +70,7 @@ namespace opengles_workspace
 
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, tetris_table.get_vertices_array().size() * sizeof(float), tetris_table.get_vertices_array().data(), GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 
@@ -90,101 +81,65 @@ namespace opengles_workspace
 	GLFWRenderer::GLFWRenderer(std::shared_ptr<Context> context)
 		: mContext(std::move(context))
 	{
+		tetris_table = Table();
 		create_shaders();
 		set_buffers();
 	}
 
-	void change_vertices_coordonates(char ax) 
+	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 	{
-		int vertices_leng = sizeof(vertices)/sizeof(float);
-		int start = (ax == 'x') ? 0 : 1;
-
-		for (int i = start; i < vertices_leng; i += 3) 
+		if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		{
-			vertices[i] += speed;
+			tetris_table.move_shape_down(tetris_table.get_axis_y_speed() * 3.0f);
 		}
-
-		for (int i = start; i < vertices_leng; i += 3)
-		{ 
-			if (vertices[i] >= 1.0f || vertices[i] <= -1.0f) 
-			{
-				speed *= -1.0f;
-				i = vertices_leng;
-			}
-		}
-	}
-
-	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		if (key == GLFW_KEY_UP && action == GLFW_REPEAT) 
+		else if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		{
-			if (speed < 0) {
-				speed *= -1.0f;
-			}
-			change_vertices_coordonates('y');
+			tetris_table.move_shape_to_right();
 		}
-		else if (key == GLFW_KEY_DOWN && action == GLFW_REPEAT)
+		else if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		{
-			if (speed > 0) {
-				speed *= -1.0f;
-			}
-			change_vertices_coordonates('y');
+			tetris_table.move_shape_to_left();
 		} 
-		else if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT)
+		else if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		{
-			if (speed > 0) {
-				speed *= -1.0f;
-			}
-			change_vertices_coordonates('x');
-		} 
-		else if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT)
-		{
-			if (speed < 0) {
-				speed *= -1.0f;
-			}
-			change_vertices_coordonates('x');
+			tetris_table.rotate_shape();
 		}
-
 	}
 
 	void GLFWRenderer::render() 
 	{
-		// GL code begin
 		glfwInit();
-
 		glfwSetKeyCallback(window(), key_callback);
-		
+
 		ReadFile reader = ReadFile();
-		int nr_frames = reader.read_file("../src/data.txt");
-		speed = (float)1 / nr_frames;
-
-		while (!glfwWindowShouldClose(window())) {
+		tetris_table.set_nr_frames(reader.read_file("../src/data.txt"));
+		tetris_table.set_axis_y_speed();
+		while (!glfwWindowShouldClose(window()) && !tetris_table.game_over()) 
+		{
 			glClear(GL_COLOR_BUFFER_BIT);
-
 			glUseProgram(shaderProgram);
 			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-
+			glDrawArrays(GL_TRIANGLES, 0, tetris_table.get_vertices_length() / 3);
 			glfwSwapBuffers(window());
 			glfwPollEvents();
-
-			key_callback;
+			tetris_table.move_shape_down(tetris_table.get_axis_y_speed());
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, tetris_table.get_vertices_array().size() * sizeof(float), tetris_table.get_vertices_array().data(), GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &VBO);
 		glDeleteProgram(shaderProgram);
+		std::cout << tetris_table.get_score() << "\n";
 
-		glfwTerminate();
-		
-		// GL code end
 		glfwSwapBuffers(window());
 	}
 
-	bool GLFWRenderer::poll() {
-		if (glfwWindowShouldClose(window())) {
+	bool GLFWRenderer::poll() 
+	{
+		if (glfwWindowShouldClose(window())) 
+		{
 			return false;
 		}
 		return true;
