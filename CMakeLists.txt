@@ -26,6 +26,7 @@ include_directories(opengles-workspace_lib PUBLIC
     third_party/glfw/include
     third_party/googletest-1.14/googletest/include
     third_party/googletest-1.14/googlemock/include
+    home/daniel/Desktop/opengles-workspace
     )
 
 add_executable(opengles-workspace 
