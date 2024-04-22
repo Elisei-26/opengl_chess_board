@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include "RotateShapes.hpp"
 #include "Shapes.hpp"
 
 namespace opengles_workspace 
@@ -75,13 +74,11 @@ namespace opengles_workspace
             short _leng_shape_mt_coords = 8;
             short _moving_shape_mt_coords[8] = {2, 10, 2, 11, 3, 10, 3, 11};
             short _mt_game_status[22][22] = {};
-            short _which_shape = 1;
             short _score = 0;
             short _nr_frames = 0;
             short _one_shape_nr_vertices = 72;
             short _vertices_length = this->_one_shape_nr_vertices;
-            Shapes _shapes;
-            RotateShapes _rotate_shapes = RotateShapes();
+            Shapes _shapes = Shapes();
             
         public:
             Table();
@@ -97,7 +94,6 @@ namespace opengles_workspace
             void check_mt_lines_completed();
             void delete_excess_of_vertices(short new_vert_length);
             void calculate_vert_coords_using_mt();
-            void update_moving_shape_mt_coords(short new_coords[]);
             void update_mt_game_status(short coords_of_landed_shape[]);
             void calculate_new_shape_vert_coords(short mt_coords[]);
             void update_vert_coords_of_moving_shape();

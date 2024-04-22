@@ -11,7 +11,6 @@ namespace opengles_workspace
             this->_mt_game_status[i][_mt_lines - 1] = 1;
             this->_mt_game_status[_mt_lines - 1][i] = 1;
         }
-        // __rotate_shapes = RotateShapes();
     }
     
     void Table::set_nr_frames(int nr_fps) 
@@ -147,14 +146,6 @@ namespace opengles_workspace
         this->delete_excess_of_vertices(vert_ind);
     }
 
-    void Table::update_moving_shape_mt_coords(short new_coords[]) 
-    {
-        for (short i = 0; i < this->_leng_shape_mt_coords; ++i) 
-        {
-            this->_moving_shape_mt_coords[i] = new_coords[i];
-        }
-    }
-
     void Table::update_mt_game_status(short coords_of_landed_shape[]) 
     {
         for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
@@ -239,40 +230,9 @@ namespace opengles_workspace
         this->check_mt_lines_completed();
         this->calculate_vert_coords_using_mt();
 
-        this->_which_shape = rand() % 8;
-        switch (this->_which_shape)
-        {
-        case 1:
-            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_cube().data());
-            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_cube().data());
-            break;
-        case 2:
-            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_bar().data());
-            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_bar().data());
-            break;
-        case 3:
-            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_T().data());
-            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_T().data());
-            break;
-        case 4:
-            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_L_left().data());
-            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_L_left().data());
-            break;
-        case 5:
-            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_L_right().data());
-            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_L_right().data());
-            break;
-        case 6:
-            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_Z_left().data());
-            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_Z_left().data());
-            break;
-        case 7:
-            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_Z_right().data());
-            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_Z_right().data());
-            break;
-        default:
-            break;
-        }
+        this->_shapes.generate_new_shape(this->_moving_shape_mt_coords);
+        this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
+
         this->_score += 3;
         this->add_new_shape_vert_coords_in_vertices_vect();
     }
@@ -362,40 +322,8 @@ namespace opengles_workspace
 
     void Table::rotate_shape() 
     {
-        switch (this->_which_shape)
-        {
-            case 2: // bar shape
-                _rotate_shapes.rotate_bar(_mt_game_status, _moving_shape_mt_coords);
-                this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
-                this->update_vert_coords_of_moving_shape();
-                break;
-            case 3: // T shape
-                _rotate_shapes.rotate_T_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
-                this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
-                this->update_vert_coords_of_moving_shape();
-                break;
-            case 4: // L left shape
-                _rotate_shapes.rotate_L_left_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
-                this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
-                this->update_vert_coords_of_moving_shape();
-                break;
-            case 5: // L right shape
-                _rotate_shapes.rotate_L_right_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
-                this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
-                this->update_vert_coords_of_moving_shape();
-                break;
-            case 6: // Z left shape
-                _rotate_shapes.rotate_Z_left_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
-                this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
-                this->update_vert_coords_of_moving_shape();
-                break;
-            case 7: // Z right shape
-                _rotate_shapes.rotate_Z_right_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
-                this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
-                this->update_vert_coords_of_moving_shape();
-                break;
-            default:
-                break;
-        }
+        this->_shapes.rotate_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
+        this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
+        this->update_vert_coords_of_moving_shape();
     }
 }
