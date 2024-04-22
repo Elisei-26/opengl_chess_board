@@ -1,38 +1,38 @@
-#include "../include/Shapes.hpp"
+#include "Shapes.hpp"
 
 namespace opengles_workspace 
 {
-    const std::vector<short> Shapes::get_mt_coords_of_new_cube() 
+    std::vector<short> Shapes::get_mt_coords_of_new_cube() const  
     {
         return this->_mt_coords_for_new_cube_shape;
     }
 
-    const std::vector<short> Shapes::get_mt_coords_of_new_bar() 
+    std::vector<short> Shapes::get_mt_coords_of_new_bar() const  
     {
         return this->_mt_coords_for_new_bar_shape;
     }
 
-    const std::vector<short> Shapes::get_mt_coords_of_new_T() 
+    std::vector<short> Shapes::get_mt_coords_of_new_T() const  
     {
         return this->_mt_coords_for_new_T_shape;
     }
 
-    const std::vector<short> Shapes::get_mt_coords_of_new_L_left() 
+    std::vector<short> Shapes::get_mt_coords_of_new_L_left() const  
     {
         return this->_mt_coords_for_new_L_left_shape;
     }
 
-    const std::vector<short> Shapes::get_mt_coords_of_new_L_right() 
+    std::vector<short> Shapes::get_mt_coords_of_new_L_right() const  
     {
         return this->_mt_coords_for_new_L_right_shape;
     }
 
-    const std::vector<short> Shapes::get_mt_coords_of_new_Z_left() 
+    std::vector<short> Shapes::get_mt_coords_of_new_Z_left() const  
     {
         return this->_mt_coords_for_new_Z_left_shape;
     }
 
-    const std::vector<short> Shapes::get_mt_coords_of_new_Z_right() 
+    std::vector<short> Shapes::get_mt_coords_of_new_Z_right() const  
     {
         return this->_mt_coords_for_new_Z_right_shape;
     }

@@ -5,23 +5,88 @@
 #include <cassert>
 #include <array>
 #include <glad/gl.h>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include <fstream>
-#include <string>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "texture.h"
 #include "read_file.hpp"
 #include <unistd.h>
 
-#include <../third_party/glm/glm.hpp>
-#include <../third_party/glm/gtc/matrix_transform.hpp>
-#include <../third_party/glm/gtc/type_ptr.hpp>
+#include <GL/glut.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+FT_Library ft;
+FT_Face face;
 
 namespace opengles_workspace
 {
-	Table _tetris_table = Table();
+	Table tetris_table = Table();
+
+
+
+
+	void initFreeType() 
+	{
+		if (FT_Init_FreeType(&ft)) 
+		{
+			// handle error
+		}
+
+		if (FT_New_Face(ft, "../third_party/font/arial.ttf", 0, &face)) 
+		{
+			// handle error
+		}
+
+		FT_Set_Pixel_Sizes(face, 0, 48);
+	}
+
+	void renderText(const char *text, float x, float y, float scale) 
+	{
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslatef(x, y, 0);
+		glScalef(scale, scale, 1);
+
+		FT_GlyphSlot g = face->glyph;
+		for (const char *p = text; *p; p++) {
+			if (FT_Load_Char(face, *p, FT_LOAD_RENDER)) 
+			{
+				continue;
+			}
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, g->bitmap.width, g->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
+
+			float x2 = x + g->bitmap_left * scale;
+			float y2 = -y - g->bitmap_top * scale;
+			float w = g->bitmap.width * scale;
+			float h = g->bitmap.rows * scale;
+
+			glBegin(GL_QUADS);
+			glTexCoord2f(0, 0); glVertex2f(x2, -y2);
+			glTexCoord2f(1, 0); glVertex2f(x2 + w, -y2);
+			glTexCoord2f(1, 1); glVertex2f(x2 + w, -y2 - h);
+			glTexCoord2f(0, 1); glVertex2f(x2, -y2 - h);
+			glEnd();
+
+			x += (g->advance.x >> 6) * scale;
+			y += (g->advance.y >> 6) * scale;
+		}
+
+		glPopMatrix();
+	}
+
+	void display() 
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		renderText("Hello, OpenGL!", 100, 100, 1.0f);
+
+		glutSwapBuffers();
+	}
 
 	void GLFWRenderer::create_shaders() 
 	{
@@ -43,14 +108,14 @@ namespace opengles_workspace
 		glDeleteShader(_fragment_shader);
 	}
 
-	const void GLFWRenderer::set_buffers() 
+	void GLFWRenderer::set_buffers() 
 	{
 		glGenVertexArrays(1, &this->_VAO);
 		glGenBuffers(1, &this->_VBO);
 
 		glBindVertexArray(this->_VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, this->_VBO);
-		glBufferData(GL_ARRAY_BUFFER, _tetris_table.get_vertices_array().size() * sizeof(float), _tetris_table.get_vertices_array().data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, tetris_table.get_vertices_array().size() * sizeof(float), tetris_table.get_vertices_array().data(), GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 
@@ -69,19 +134,19 @@ namespace opengles_workspace
 	{
 		if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		{
-			_tetris_table.move_shape_down(_tetris_table.get_axis_y_speed() * 3.0f);
+			tetris_table.move_shape_down(tetris_table.get_axis_y_speed() * 3.0f);
 		}
 		else if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		{
-			_tetris_table.move_shape_to_right();
+			tetris_table.move_shape_to_right();
 		}
 		else if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		{
-			_tetris_table.move_shape_to_left();
+			tetris_table.move_shape_to_left();
 		} 
 		else if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		{
-			_tetris_table.rotate_shape();
+			tetris_table.rotate_shape();
 		}
 	}
 
@@ -90,27 +155,52 @@ namespace opengles_workspace
 		glfwInit();
 		glfwSetKeyCallback(window(), key_callback);
 
+
+
+
+
+		// glutInit(&argc, argv);
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+		// glutInitWindowSize(800, 600);
+		// glutCreateWindow("OpenGL Text Rendering");
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		// glOrtho(0, 1000, 0, 1000, -1, 1);
+		// glOrtho(0.0f, 1000, 1000, 0.0f, -1.0f, 1.0f);
+
+		glutDisplayFunc(display);
+
+		initFreeType();
+
+		glutMainLoop();
+
+
+
+
+
+
 		ReadFile reader = ReadFile();
-		_tetris_table.set_nr_frames(reader.read_file("../src/data.txt"));
-		_tetris_table.set_axis_y_speed();
-		while (!glfwWindowShouldClose(window()) && !_tetris_table.game_over()) 
+		tetris_table.set_nr_frames(reader.read_file("../src/data.txt"));
+		tetris_table.set_axis_y_speed();
+		while (!glfwWindowShouldClose(window()) && !tetris_table.game_over()) 
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
 			glUseProgram(this->_shader_program);
 			glBindVertexArray(this->_VAO);
-			glDrawArrays(GL_TRIANGLES, 0, _tetris_table.get_vertices_length() / 3);
+			glDrawArrays(GL_TRIANGLES, 0, tetris_table.get_vertices_length() / 3);
 			glfwSwapBuffers(window());
 			glfwPollEvents();
-			_tetris_table.move_shape_down(_tetris_table.get_axis_y_speed());
+			tetris_table.move_shape_down(tetris_table.get_axis_y_speed());
 			glBindBuffer(GL_ARRAY_BUFFER, this->_VBO);
-			glBufferData(GL_ARRAY_BUFFER, _tetris_table.get_vertices_array().size() * sizeof(float), _tetris_table.get_vertices_array().data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, tetris_table.get_vertices_array().size() * sizeof(float), tetris_table.get_vertices_array().data(), GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		glDeleteVertexArrays(1, &this->_VAO);
 		glDeleteBuffers(1, &this->_VBO);
 		glDeleteProgram(this->_shader_program);
-		std::cout << _tetris_table.get_score() << "\n";
+		std::cout << tetris_table.get_score() << "\n";
 
 		glfwSwapBuffers(window());
 	}

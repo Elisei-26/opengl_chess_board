@@ -1,16 +1,17 @@
-#include "../include/Table.hpp"
+#include "Table.hpp"
 
 namespace opengles_workspace 
 {           
     Table::Table() 
     {
-        for (short i = 0; i < 22; ++i) // create a virtual margin in matrix that represent game status
+        for (short i = 0; i < this->_mt_lines; ++i) // create a virtual margin in matrix that represent game status
         {
             this->_mt_game_status[i][0] = 1;
             this->_mt_game_status[0][i] = 1;
-            this->_mt_game_status[i][21] = 1;
-            this->_mt_game_status[21][i] = 1;
+            this->_mt_game_status[i][_mt_lines - 1] = 1;
+            this->_mt_game_status[_mt_lines - 1][i] = 1;
         }
+        // __rotate_shapes = RotateShapes();
     }
     
     void Table::set_nr_frames(int nr_fps) 
@@ -23,27 +24,27 @@ namespace opengles_workspace
         this->_axis_y_speed = (float)1 / this->_nr_frames * -1.0f;
     }
 
-    const std::vector<float> Table::get_vertices_array() 
+    std::vector<float> Table::get_vertices_array() const 
     {
         return this->_vertices;
     }
 
-    const float Table::get_axis_y_speed() 
+    float Table::get_axis_y_speed() const 
     {
         return this->_axis_y_speed;
     }
 
-    const short Table::get_vertices_length() 
+    short Table::get_vertices_length() const 
     {
         return this->_vertices_length;
     }
 
-    const short Table::get_score() 
+    short Table::get_score() const 
     {
         return this->_score;
     }
 
-    const bool Table::game_over() 
+    bool Table::game_over() const 
     {
         if (this->_mt_game_status[2][10] == 0) 
         {
@@ -54,7 +55,7 @@ namespace opengles_workspace
 
     void Table::delete_line_from_mt(short line) 
     {
-        for (short j = 1; j < 21; ++j) 
+        for (short j = 1; j < this->_mt_lines - 1; ++j) 
         {
             this->_mt_game_status[line][j] = 0;
         }
@@ -65,20 +66,20 @@ namespace opengles_workspace
     {
         for (short i = line; i > 1; --i) 
         {
-            for (short j = 1; j < 21; ++j) 
+            for (short j = 1; j < this->_mt_lines - 1; ++j) 
             {
                 this->_mt_game_status[i][j] = this->_mt_game_status[i - 1][j];
             }
         }
     }
 
-    const void Table::check_mt_lines_completed() 
+    void Table::check_mt_lines_completed() 
     {
         bool line_completed = true;
-        for (short i = 20; i > 0; --i) 
+        for (short i = _mt_lines - 2; i > 0; --i) 
         {
             line_completed = true;
-            for (short j = 1; j < 21; ++j) // check if line is complete
+            for (short j = 1; j < this->_mt_lines - 1; ++j) // check if line is complete
             {
                 if (this->_mt_game_status[i][j] == 0) 
                 {
@@ -108,9 +109,9 @@ namespace opengles_workspace
         float mt_col_to_y_coord = 0.0f;
         float adjust_x_y_coord = 0.1f;
 
-        for (short i = 20; i > 0; --i) 
+        for (short i = _mt_lines - 2; i > 0; --i) 
         {
-            for (short j = 1; j < 21; ++j) 
+            for (short j = 1; j < this->_mt_lines - 1; ++j) 
             {
                 if (this->_mt_game_status[i][j] == 2)
                 {
@@ -146,9 +147,9 @@ namespace opengles_workspace
         this->delete_excess_of_vertices(vert_ind);
     }
 
-    void Table::update_moving_shape_mt_coords(const short new_coords[]) 
+    void Table::update_moving_shape_mt_coords(short new_coords[]) 
     {
-        for (short i = 0; i < 8; ++i) 
+        for (short i = 0; i < this->_leng_shape_mt_coords; ++i) 
         {
             this->_moving_shape_mt_coords[i] = new_coords[i];
         }
@@ -156,20 +157,20 @@ namespace opengles_workspace
 
     void Table::update_mt_game_status(short coords_of_landed_shape[]) 
     {
-        for (short i = 0; i < 8; i += 2) 
+        for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
         {
             this->_mt_game_status[coords_of_landed_shape[i]][coords_of_landed_shape[i + 1]] = 2;
         }
     }
 
-    void Table::calculate_new_shape_vert_coords(const short mt_coords[]) 
+    void Table::calculate_new_shape_vert_coords(short mt_coords[]) 
     {
         short vert_ind = 0;
         float mt_line_to_x_coord = 0.0f;
         float mt_col_to_y_coord = 0.0f;
         float adjust_x_y_coord = 0.1f;
 
-        for (short i = 0; i < 8; i += 2) 
+        for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
         {
             mt_line_to_x_coord = (float)mt_coords[i + 1] / 10.0f - 1.1f;
             mt_col_to_y_coord = ((float)mt_coords[i] / 10.0f - 1.0f) * -1.0f;
@@ -219,10 +220,10 @@ namespace opengles_workspace
         }
     }
 
-    const bool Table::sth_under_falling_shape() 
+    bool Table::sth_under_falling_shape() const 
     {
         bool falling = true;
-        for (short i = 0; i < 8; i += 2) // check if there is sth under the shape
+        for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) // check if there is sth under the shape
         {
             if (this->_mt_game_status[this->_moving_shape_mt_coords[i] + 1][this->_moving_shape_mt_coords[i + 1]] != 0) 
             {
@@ -230,6 +231,50 @@ namespace opengles_workspace
             }
         }
         return falling;
+    }
+
+    void Table::generate_the_new_shape() 
+    {
+        this->update_mt_game_status(this->_moving_shape_mt_coords);
+        this->check_mt_lines_completed();
+        this->calculate_vert_coords_using_mt();
+
+        this->_which_shape = rand() % 8;
+        switch (this->_which_shape)
+        {
+        case 1:
+            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_cube().data());
+            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_cube().data());
+            break;
+        case 2:
+            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_bar().data());
+            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_bar().data());
+            break;
+        case 3:
+            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_T().data());
+            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_T().data());
+            break;
+        case 4:
+            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_L_left().data());
+            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_L_left().data());
+            break;
+        case 5:
+            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_L_right().data());
+            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_L_right().data());
+            break;
+        case 6:
+            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_Z_left().data());
+            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_Z_left().data());
+            break;
+        case 7:
+            this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_Z_right().data());
+            this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_Z_right().data());
+            break;
+        default:
+            break;
+        }
+        this->_score += 3;
+        this->add_new_shape_vert_coords_in_vertices_vect();
     }
 
     void Table::move_shape_down(float axis_y_speed) 
@@ -241,7 +286,7 @@ namespace opengles_workspace
             if (this->_move_shape_y_status >= 0.1f) // daca forma s-a deplasat in jos o pozitie din matrice
             {
                 this->_move_shape_y_status = 0.0f;
-                for (short i = 0; i < 8; i += 2) 
+                for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
                 {
                     ++this->_moving_shape_mt_coords[i];
                 }
@@ -255,53 +300,14 @@ namespace opengles_workspace
         }
         else if (!falling) // daca forma a terminat caderea
         {			
-            this->update_mt_game_status(this->_moving_shape_mt_coords);
-            this->check_mt_lines_completed();
-            this->calculate_vert_coords_using_mt();
-
-            this->_which_shape = rand() % 8;
-            switch (this->_which_shape)
-            {
-            case 1:
-                this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_cube().data());
-                this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_cube().data());
-                break;
-            case 2:
-                this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_bar().data());
-                this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_bar().data());
-                break;
-            case 3:
-                this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_T().data());
-                this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_T().data());
-                break;
-            case 4:
-                this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_L_left().data());
-                this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_L_left().data());
-                break;
-            case 5:
-                this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_L_right().data());
-                this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_L_right().data());
-                break;
-            case 6:
-                this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_Z_left().data());
-                this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_Z_left().data());
-                break;
-            case 7:
-                this->update_moving_shape_mt_coords(_shapes.get_mt_coords_of_new_Z_right().data());
-                this->calculate_new_shape_vert_coords(_shapes.get_mt_coords_of_new_Z_right().data());
-                break;
-            default:
-                break;
-            }
-            this->_score += 3;
-            this->add_new_shape_vert_coords_in_vertices_vect();
+            generate_the_new_shape();
         }
     }
 
     void Table::move_shape_to_right() 
     {
         bool can_move_right = true;
-        for (short i = 0; i < 8; i += 2) 
+        for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
         {
             // nu are margine sau alta forma in partea dreapta && nu are margine sau forma in partea dreapta cu o pozitie mai jos
             if (this->_mt_game_status[this->_moving_shape_mt_coords[i]][this->_moving_shape_mt_coords[i + 1] + 1] != 0 && this->_mt_game_status[this->_moving_shape_mt_coords[i] + 1][this->_moving_shape_mt_coords[i + 1] + 1] != 0)
@@ -313,7 +319,7 @@ namespace opengles_workspace
 
         if (can_move_right)
         {
-            for (short i = 1; i < 8; i += 2) 
+            for (short i = 1; i < this->_leng_shape_mt_coords; i += 2) 
             {
                 ++this->_moving_shape_mt_coords[i];
             }
@@ -329,7 +335,7 @@ namespace opengles_workspace
     void Table::move_shape_to_left() 
     {
         bool can_move_left = true;
-        for (short i = 0; i < 8; i += 2) 
+        for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
         {
             // nu are margine sau alta forma in partea stanga && nu are margine sau forma in partea stanga cu o pozitie mai jos
             if (this->_mt_game_status[this->_moving_shape_mt_coords[i]][this->_moving_shape_mt_coords[i + 1] - 1] != 0 && this->_mt_game_status[this->_moving_shape_mt_coords[i] + 1][this->_moving_shape_mt_coords[i + 1] - 1] != 0)
@@ -341,7 +347,7 @@ namespace opengles_workspace
 
         if (can_move_left)
         {
-            for (short i = 1; i < 8; i += 2) 
+            for (short i = 1; i < this->_leng_shape_mt_coords; i += 2) 
             {
                 --this->_moving_shape_mt_coords[i];
             }
@@ -359,266 +365,32 @@ namespace opengles_workspace
         switch (this->_which_shape)
         {
             case 2: // bar shape
-                if (this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] + 1][this->_moving_shape_mt_coords[5] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] + 2][this->_moving_shape_mt_coords[7] - 2] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        ++this->_moving_shape_mt_coords[4];
-                        --this->_moving_shape_mt_coords[5];
-                        this->_moving_shape_mt_coords[6] += 2;
-                        this->_moving_shape_mt_coords[7] -= 2;
-                    }
-                } 
-                else 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] - 1][this->_moving_shape_mt_coords[5] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] - 2][this->_moving_shape_mt_coords[7] + 2] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        --this->_moving_shape_mt_coords[4];
-                        ++this->_moving_shape_mt_coords[5];
-                        this->_moving_shape_mt_coords[6] -= 2;
-                        this->_moving_shape_mt_coords[7] += 2;
-                    }
-                }
+                _rotate_shapes.rotate_bar(_mt_game_status, _moving_shape_mt_coords);
                 this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
                 this->update_vert_coords_of_moving_shape();
                 break;
             case 3: // T shape
-                if(this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2] && this->_moving_shape_mt_coords[3] < this->_moving_shape_mt_coords[1]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] + 1][this->_moving_shape_mt_coords[5] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] + 1][this->_moving_shape_mt_coords[7] - 1] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        ++this->_moving_shape_mt_coords[4];
-                        ++this->_moving_shape_mt_coords[5];
-                        ++this->_moving_shape_mt_coords[6];
-                        --this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[1] == this->_moving_shape_mt_coords[3] && this->_moving_shape_mt_coords[2] < this->_moving_shape_mt_coords[0]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] + 1][this->_moving_shape_mt_coords[5] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] - 1][this->_moving_shape_mt_coords[7] - 1] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        ++this->_moving_shape_mt_coords[4];
-                        --this->_moving_shape_mt_coords[5];
-                        --this->_moving_shape_mt_coords[6];
-                        --this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2] && this->_moving_shape_mt_coords[3] > this->_moving_shape_mt_coords[1]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] - 1][this->_moving_shape_mt_coords[5] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] - 1][this->_moving_shape_mt_coords[7] + 1] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        --this->_moving_shape_mt_coords[4];
-                        --this->_moving_shape_mt_coords[5];
-                        --this->_moving_shape_mt_coords[6];
-                        ++this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[1] == this->_moving_shape_mt_coords[3] && this->_moving_shape_mt_coords[2] > this->_moving_shape_mt_coords[0]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] - 1][this->_moving_shape_mt_coords[5] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] + 1][this->_moving_shape_mt_coords[7] + 1] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        --this->_moving_shape_mt_coords[4];
-                        ++this->_moving_shape_mt_coords[5];
-                        ++this->_moving_shape_mt_coords[6];
-                        ++this->_moving_shape_mt_coords[7];
-                    }
-                }
+                _rotate_shapes.rotate_T_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
                 this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
                 this->update_vert_coords_of_moving_shape();
                 break;
             case 4: // L left shape
-                if(this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2] && this->_moving_shape_mt_coords[3] < this->_moving_shape_mt_coords[1]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] - 2][this->_moving_shape_mt_coords[5]] == 0 && 
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] + 1][this->_moving_shape_mt_coords[7] - 1] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        this->_moving_shape_mt_coords[4] -= 2;
-                        ++this->_moving_shape_mt_coords[6];
-                        --this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[1] == this->_moving_shape_mt_coords[3] && this->_moving_shape_mt_coords[2] < this->_moving_shape_mt_coords[0]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4]][this->_moving_shape_mt_coords[5] + 2] == 0 && 
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] - 1][this->_moving_shape_mt_coords[7] - 1] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        this->_moving_shape_mt_coords[5] += 2;
-                        --this->_moving_shape_mt_coords[6];
-                        --this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2] && this->_moving_shape_mt_coords[3] > this->_moving_shape_mt_coords[1]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] + 2][this->_moving_shape_mt_coords[5]] == 0 && 
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] - 1][this->_moving_shape_mt_coords[7] + 1] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        this->_moving_shape_mt_coords[4] += 2;
-                        --this->_moving_shape_mt_coords[6];
-                        ++this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[1] == this->_moving_shape_mt_coords[3] && this->_moving_shape_mt_coords[2] > this->_moving_shape_mt_coords[0]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4]][this->_moving_shape_mt_coords[5] - 2] == 0 && 
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] + 1][this->_moving_shape_mt_coords[7] + 1] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        this->_moving_shape_mt_coords[5] -= 2;
-                        ++this->_moving_shape_mt_coords[6];
-                        ++this->_moving_shape_mt_coords[7];
-                    }
-                }
+                _rotate_shapes.rotate_L_left_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
                 this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
                 this->update_vert_coords_of_moving_shape();
                 break;
             case 5: // L right shape
-                if(this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2] && this->_moving_shape_mt_coords[3] > this->_moving_shape_mt_coords[1]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4]][this->_moving_shape_mt_coords[5] - 2] == 0 && 
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] - 1][this->_moving_shape_mt_coords[7] + 1] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        this->_moving_shape_mt_coords[5] -= 2;
-                        --this->_moving_shape_mt_coords[6];
-                        ++this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[1] == this->_moving_shape_mt_coords[3] && this->_moving_shape_mt_coords[2] > this->_moving_shape_mt_coords[0]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] - 2][this->_moving_shape_mt_coords[5]] == 0 && 
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] + 1][this->_moving_shape_mt_coords[7] + 1] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        this->_moving_shape_mt_coords[4] -= 2;
-                        ++this->_moving_shape_mt_coords[6];
-                        ++this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2] && this->_moving_shape_mt_coords[3] < this->_moving_shape_mt_coords[1]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4]][this->_moving_shape_mt_coords[5] + 2] == 0 && 
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] + 1][this->_moving_shape_mt_coords[7] - 1] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        this->_moving_shape_mt_coords[5] += 2;
-                        ++this->_moving_shape_mt_coords[6];
-                        --this->_moving_shape_mt_coords[7];
-                    }
-                }
-                else if (this->_moving_shape_mt_coords[1] == this->_moving_shape_mt_coords[3] && this->_moving_shape_mt_coords[2] < this->_moving_shape_mt_coords[0]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] + 2][this->_moving_shape_mt_coords[5]] == 0 && 
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6] - 1][this->_moving_shape_mt_coords[7] - 1] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        this->_moving_shape_mt_coords[4] += 2;
-                        --this->_moving_shape_mt_coords[6];
-                        --this->_moving_shape_mt_coords[7];
-                    }
-                }
+                _rotate_shapes.rotate_L_right_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
                 this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
                 this->update_vert_coords_of_moving_shape();
                 break;
             case 6: // Z left shape
-                if (this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] - 1][this->_moving_shape_mt_coords[5] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6]][this->_moving_shape_mt_coords[7] - 2] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        --this->_moving_shape_mt_coords[4];
-                        --this->_moving_shape_mt_coords[5];
-                        this->_moving_shape_mt_coords[7] -= 2;
-                    }
-                } 
-                else 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] + 1][this->_moving_shape_mt_coords[5] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6]][this->_moving_shape_mt_coords[7] + 2] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        ++this->_moving_shape_mt_coords[4];
-                        ++this->_moving_shape_mt_coords[5];
-                        this->_moving_shape_mt_coords[7] += 2;
-                    }
-                }
+                _rotate_shapes.rotate_Z_left_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
                 this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
                 this->update_vert_coords_of_moving_shape();
                 break;
             case 7: // Z right shape
-                if (this->_moving_shape_mt_coords[0] == this->_moving_shape_mt_coords[2]) 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] - 1][this->_moving_shape_mt_coords[3] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] - 1][this->_moving_shape_mt_coords[5] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6]][this->_moving_shape_mt_coords[7] + 2] == 0) 
-                    {
-                        --this->_moving_shape_mt_coords[2];
-                        --this->_moving_shape_mt_coords[3];
-                        --this->_moving_shape_mt_coords[4];
-                        ++this->_moving_shape_mt_coords[5];
-                        this->_moving_shape_mt_coords[7] += 2;
-                    }
-                } 
-                else 
-                {
-                    if (this->_mt_game_status[this->_moving_shape_mt_coords[2] + 1][this->_moving_shape_mt_coords[3] + 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[4] + 1][this->_moving_shape_mt_coords[5] - 1] == 0 &&
-                        this->_mt_game_status[this->_moving_shape_mt_coords[6]][this->_moving_shape_mt_coords[7] - 2] == 0) 
-                    {
-                        ++this->_moving_shape_mt_coords[2];
-                        ++this->_moving_shape_mt_coords[3];
-                        ++this->_moving_shape_mt_coords[4];
-                        --this->_moving_shape_mt_coords[5];
-                        this->_moving_shape_mt_coords[7] -= 2;
-                    }
-                }
+                _rotate_shapes.rotate_Z_right_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
                 this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
                 this->update_vert_coords_of_moving_shape();
                 break;

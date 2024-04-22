@@ -15,12 +15,12 @@ namespace opengles_workspace
             std::vector<short> _mt_coords_for_new_Z_right_shape = {2, 10, 2, 11, 3, 10, 3, 9};
             
         public:
-            const std::vector<short> get_mt_coords_of_new_cube();
-            const std::vector<short> get_mt_coords_of_new_bar();
-            const std::vector<short> get_mt_coords_of_new_T();
-            const std::vector<short> get_mt_coords_of_new_L_left();
-            const std::vector<short> get_mt_coords_of_new_L_right();
-            const std::vector<short> get_mt_coords_of_new_Z_left();
-            const std::vector<short> get_mt_coords_of_new_Z_right();
+            std::vector<short> get_mt_coords_of_new_cube() const;
+            std::vector<short> get_mt_coords_of_new_bar() const;
+            std::vector<short> get_mt_coords_of_new_T() const;
+            std::vector<short> get_mt_coords_of_new_L_left() const;
+            std::vector<short> get_mt_coords_of_new_L_right() const;
+            std::vector<short> get_mt_coords_of_new_Z_left() const;
+            std::vector<short> get_mt_coords_of_new_Z_right() const;
     };
 }

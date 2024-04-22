@@ -4,15 +4,22 @@
 #include <context.hpp>
 #include <polled_object.hpp>
 
-
 #include <glad/gl.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include "../include/Table.hpp"
+
+
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+
+#include <iostream>
+#include <fstream>
+#include "Table.hpp"
 
 namespace opengles_workspace
 {
-	class GLFWRenderer : public PolledObject//, public Table
+	class GLFWRenderer : public PolledObject
 	{
 	public:
 		GLFWRenderer(std::shared_ptr<Context> context);
@@ -25,7 +32,7 @@ namespace opengles_workspace
 
 
 		void create_shaders();
-		const void set_buffers();
+		void set_buffers();
 
 	private:
 		const char* _vertex_shader_source = R"(
