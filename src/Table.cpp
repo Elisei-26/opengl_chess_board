@@ -230,7 +230,33 @@ namespace opengles_workspace
         this->check_mt_lines_completed();
         this->calculate_vert_coords_using_mt();
 
-        this->_shapes.generate_new_shape(this->_moving_shape_mt_coords);
+        this->_which_shape = rand() % 8;
+        switch (this->_which_shape)
+        {
+        case 1:
+            this->_shapes = new Cube(this->_moving_shape_mt_coords);
+            break;
+        case 2:
+            this->_shapes = new Bar(this->_moving_shape_mt_coords);
+            break;
+        case 3:
+            this->_shapes = new T_Shape(this->_moving_shape_mt_coords);
+            break;
+        case 4:
+            this->_shapes = new L_Left(this->_moving_shape_mt_coords);
+            break;
+        case 5:
+            this->_shapes = new L_Right(this->_moving_shape_mt_coords);
+            break;
+        case 6:
+            this->_shapes = new Z_Left(this->_moving_shape_mt_coords);
+            break;
+        case 7:
+            this->_shapes = new Z_Right(this->_moving_shape_mt_coords);
+            break;
+        default:
+            break;
+        }
         this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
 
         this->_score += 3;
@@ -322,7 +348,7 @@ namespace opengles_workspace
 
     void Table::rotate_shape() 
     {
-        this->_shapes.rotate_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
+        this->_shapes->rotate_shape(this->_mt_game_status, this->_moving_shape_mt_coords);
         this->calculate_new_shape_vert_coords(this->_moving_shape_mt_coords);
         this->update_vert_coords_of_moving_shape();
     }

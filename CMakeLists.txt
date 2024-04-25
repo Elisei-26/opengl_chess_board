@@ -14,7 +14,13 @@ add_subdirectory(gtests)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++17")
 
 add_library(opengles-workspace_lib STATIC 
-    src/Shapes.cpp
+    src/Shapes/Bar.cpp
+    src/Shapes/Cube.cpp
+    src/Shapes/L_Left.cpp
+    src/Shapes/L_Right.cpp
+    src/Shapes/T_Shape.cpp
+    src/Shapes/Z_Left.cpp
+    src/Shapes/Z_Right.cpp
     src/Table.cpp
     src/glfw_application.cpp
     src/main_loop.cpp

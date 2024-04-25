@@ -1,7 +1,15 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <memory>
 #include "Shapes.hpp"
+#include "Shapes/Cube.hpp"
+#include "Shapes/Bar.hpp"
+#include "Shapes/T_Shape.hpp"
+#include "Shapes/L_Left.hpp"
+#include "Shapes/L_Right.hpp"
+#include "Shapes/Z_Left.hpp"
+#include "Shapes/Z_Right.hpp"
 
 namespace opengles_workspace 
 {
@@ -75,10 +83,11 @@ namespace opengles_workspace
             short _moving_shape_mt_coords[8] = {2, 10, 2, 11, 3, 10, 3, 11};
             short _mt_game_status[22][22] = {};
             short _score = 0;
+            short _which_shape = 1;
             short _nr_frames = 0;
             short _one_shape_nr_vertices = 72;
             short _vertices_length = this->_one_shape_nr_vertices;
-            Shapes _shapes = Shapes();
+            Shapes* _shapes = new Cube(this->_moving_shape_mt_coords);
             
         public:
             Table();
