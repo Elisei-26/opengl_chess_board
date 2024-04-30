@@ -234,25 +234,25 @@ namespace opengles_workspace
         switch (this->_which_shape)
         {
         case 1:
-            this->_shapes = new Cube(this->_moving_shape_mt_coords);
+            this->_shapes = std::make_unique<Cube>(this->_moving_shape_mt_coords);
             break;
         case 2:
-            this->_shapes = new Bar(this->_moving_shape_mt_coords);
+            this->_shapes = std::make_unique<Bar>(this->_moving_shape_mt_coords);
             break;
         case 3:
-            this->_shapes = new T_Shape(this->_moving_shape_mt_coords);
+            this->_shapes = std::make_unique<T_Shape>(this->_moving_shape_mt_coords);
             break;
         case 4:
-            this->_shapes = new L_Left(this->_moving_shape_mt_coords);
+            this->_shapes = std::make_unique<L_Left>(this->_moving_shape_mt_coords);
             break;
         case 5:
-            this->_shapes = new L_Right(this->_moving_shape_mt_coords);
+            this->_shapes = std::make_unique<L_Right>(this->_moving_shape_mt_coords);
             break;
         case 6:
-            this->_shapes = new Z_Left(this->_moving_shape_mt_coords);
+            this->_shapes = std::make_unique<Z_Left>(this->_moving_shape_mt_coords);
             break;
         case 7:
-            this->_shapes = new Z_Right(this->_moving_shape_mt_coords);
+            this->_shapes = std::make_unique<Z_Right>(this->_moving_shape_mt_coords);
             break;
         default:
             break;
@@ -266,10 +266,10 @@ namespace opengles_workspace
     void Table::move_shape_down(float axis_y_speed) 
     {	
         bool falling = this->sth_under_falling_shape();
-        if (falling) // daca forma se afla in cadere
+        if (falling) // if shape is falling
         {
             this->_move_shape_y_status = this->_move_shape_y_status + (this->_axis_y_speed * -1);
-            if (this->_move_shape_y_status >= 0.1f) // daca forma s-a deplasat in jos o pozitie din matrice
+            if (this->_move_shape_y_status >= 0.1f) // if shape moved down one matrix position
             {
                 this->_move_shape_y_status = 0.0f;
                 for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
@@ -284,7 +284,7 @@ namespace opengles_workspace
                 this->_vertices[i] += this->_axis_y_speed;
             }
         }
-        else if (!falling) // daca forma a terminat caderea
+        else if (!falling) // if shape ended the falling
         {			
             generate_the_new_shape();
         }
@@ -295,7 +295,7 @@ namespace opengles_workspace
         bool can_move_right = true;
         for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
         {
-            // nu are margine sau alta forma in partea dreapta && nu are margine sau forma in partea dreapta cu o pozitie mai jos
+            // it has no border or other shape on the right side && it has no border or shape on the right side with a lower position
             if (this->_mt_game_status[this->_moving_shape_mt_coords[i]][this->_moving_shape_mt_coords[i + 1] + 1] != 0 && this->_mt_game_status[this->_moving_shape_mt_coords[i] + 1][this->_moving_shape_mt_coords[i + 1] + 1] != 0)
             {
                 can_move_right = false;
@@ -323,7 +323,7 @@ namespace opengles_workspace
         bool can_move_left = true;
         for (short i = 0; i < this->_leng_shape_mt_coords; i += 2) 
         {
-            // nu are margine sau alta forma in partea stanga && nu are margine sau forma in partea stanga cu o pozitie mai jos
+            // it has no border or other shape on the left side && it has no border or shape on the left side with a lower position
             if (this->_mt_game_status[this->_moving_shape_mt_coords[i]][this->_moving_shape_mt_coords[i + 1] - 1] != 0 && this->_mt_game_status[this->_moving_shape_mt_coords[i] + 1][this->_moving_shape_mt_coords[i + 1] - 1] != 0)
             {
                 can_move_left = false;

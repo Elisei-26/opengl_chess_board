@@ -16,7 +16,7 @@ namespace opengles_workspace
     class Table
     {
         protected:
-            std::vector<float> _vertices = { //0.0f
+            std::vector<float> _vertices = {
                 -0.1f, 0.8f, 0.0f, // square top left
                 0.0f, 0.8f, 0.0f,
                 -0.1f,  0.9f, 0.0f,
@@ -46,7 +46,7 @@ namespace opengles_workspace
                 0.1f, 0.8f, 0.0f
             };
 
-            float _vert_coords_generated_shape[72] = { //0.0f
+            float _vert_coords_generated_shape[72] = {
                 -0.1f, 0.8f, 0.0f, // square top left
                 0.0f, 0.8f, 0.0f,
                 -0.1f,  0.9f, 0.0f,
@@ -87,7 +87,7 @@ namespace opengles_workspace
             short _nr_frames = 0;
             short _one_shape_nr_vertices = 72;
             short _vertices_length = this->_one_shape_nr_vertices;
-            Shapes* _shapes = new Cube(this->_moving_shape_mt_coords);
+            std::unique_ptr<Shapes> _shapes = std::make_unique<Cube>(this->_moving_shape_mt_coords);
             
         public:
             Table();

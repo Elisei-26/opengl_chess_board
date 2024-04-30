@@ -15,7 +15,7 @@ namespace opengles_workspace
         return this->_mt_coords_of_shape;
     }
 
-    void Bar::rotate_shape(short mt[22][22], short moving_shape_mt_coords[8]) 
+    void Bar::rotate_shape(short mt[22][22], short moving_shape_mt_coords[8])
     {
         if (moving_shape_mt_coords[0] == moving_shape_mt_coords[2]) 
         {

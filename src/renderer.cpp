@@ -14,71 +14,9 @@
 #include "read_file.hpp"
 #include <unistd.h>
 
-#include <GL/glut.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-FT_Library ft;
-FT_Face face;
-
 namespace opengles_workspace
 {
 	Table tetris_table = Table();
-
-
-
-
-	// void initFreeType() 
-	// {
-	// 	if (FT_Init_FreeType(&ft)) 
-	// 	{
-	// 		// handle error
-	// 	}
-	// 	if (FT_New_Face(ft, "../third_party/font/arial.ttf", 0, &face)) 
-	// 	{
-	// 		// handle error
-	// 	}
-	// 	FT_Set_Pixel_Sizes(face, 0, 48);
-	// }
-
-	// void renderText(const char *text, float x, float y, float scale) 
-	// {
-	// 	glMatrixMode(GL_MODELVIEW);
-	// 	glPushMatrix();
-	// 	glLoadIdentity();
-	// 	glTranslatef(x, y, 0);
-	// 	glScalef(scale, scale, 1);
-	// 	FT_GlyphSlot g = face->glyph;
-	// 	for (const char *p = text; *p; p++) {
-	// 		if (FT_Load_Char(face, *p, FT_LOAD_RENDER)) 
-	// 		{
-	// 			continue;
-	// 		}
-	// 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, g->bitmap.width, g->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
-	// 		float x2 = x + g->bitmap_left * scale;
-	// 		float y2 = -y - g->bitmap_top * scale;
-	// 		float w = g->bitmap.width * scale;
-	// 		float h = g->bitmap.rows * scale;
-	// 		glBegin(GL_QUADS);
-	// 		glTexCoord2f(0, 0); glVertex2f(x2, -y2);
-	// 		glTexCoord2f(1, 0); glVertex2f(x2 + w, -y2);
-	// 		glTexCoord2f(1, 1); glVertex2f(x2 + w, -y2 - h);
-	// 		glTexCoord2f(0, 1); glVertex2f(x2, -y2 - h);
-	// 		glEnd();
-	// 		x += (g->advance.x >> 6) * scale;
-	// 		y += (g->advance.y >> 6) * scale;
-	// 	}
-	// 	glPopMatrix();
-	// }
-
-	// void display() 
-	// {
-	// 	glClear(GL_COLOR_BUFFER_BIT);
-	// 	renderText("Hello, OpenGL!", 100, 100, 1.0f);
-	// 	glutSwapBuffers();
-	// }
-
-
 
 	void GLFWRenderer::create_shaders() 
 	{
@@ -146,26 +84,6 @@ namespace opengles_workspace
 	{
 		glfwInit();
 		glfwSetKeyCallback(window(), key_callback);
-
-
-
-
-
-		// // glutInit(&argc, argv);
-		// glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-		// // glutInitWindowSize(800, 600);
-		// // glutCreateWindow("OpenGL Text Rendering");
-		// glMatrixMode(GL_PROJECTION);
-		// glLoadIdentity();
-		// // glOrtho(0, 1000, 0, 1000, -1, 1);
-		// // glOrtho(0.0f, 1000, 1000, 0.0f, -1.0f, 1.0f);
-		// glutDisplayFunc(display);
-		// initFreeType();
-		// glutMainLoop();
-
-
-
-
 
 
 		ReadFile reader = ReadFile();
