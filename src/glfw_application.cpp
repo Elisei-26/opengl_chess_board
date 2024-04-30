@@ -60,6 +60,7 @@ int GlfwApplication::run() {
 
 	loop.addPolledObject(pInput);
 	loop.addPolledObject(pRenderer);
+	// glUseProgram(32);
 	pRenderer->render();
 	loop.run();
 	return 0;

@@ -6,6 +6,6 @@ using namespace opengles_workspace;
 
 int main()
 {
-    GlfwApplication app(640, 480);
+    GlfwApplication app(1000, 1000);
     return app.run();
 }
